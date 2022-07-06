@@ -17,4 +17,5 @@ jobs:
       - uses: actions/checkout@v1
       - uses: ./action-b
       - run: |
+          # If FOO is set from action-b then env vars ARE persisted
           echo "FOO=${FOO}"
