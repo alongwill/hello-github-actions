@@ -12,8 +12,6 @@ on:
 jobs:
   invoke-ephemeral-env-shared-workflow:
     runs-on: ubuntu-latest
-    if: ${{ contains(github.event.comment.body, '/ephemeral') }}
-
     steps:
       - name: Work out branch we are on
         id: branch
@@ -38,4 +36,9 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: 'Action succeeded! ✅ ',
-            });     
+            });  
+      - name: Dump GitHub context to use for local testing
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "$GITHUB_CONTEXT"   
