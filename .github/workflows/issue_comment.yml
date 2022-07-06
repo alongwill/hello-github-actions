@@ -20,7 +20,7 @@ jobs:
           REF=$(gh pr view ${{ github.event.issue.number }} -R alongwill/${GITHUB_REPOSITORY##*/} --json headRefName -q '.headRefName')
           echo "branch_name=${REF}" >> ${GITHUB_ENV}
         env:
-         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Debug values
         run: |
