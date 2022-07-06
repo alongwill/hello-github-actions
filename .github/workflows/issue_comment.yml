@@ -18,6 +18,7 @@ jobs:
         id: branch
         run: |
           REF=$(gh pr view ${{ github.event.issue.number }} -R alongwill/${GITHUB_REPOSITORY##*/} --json headRefName -q '.headRefName')
+          # When run from a PR this will show main/master
           echo "branch_name=${REF}" >> ${GITHUB_ENV}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -27,20 +28,23 @@ jobs:
           echo "branch_ref   = $branch_name (from gh cli)"
           echo "branch       = ${GITHUB_REF##*/} (from GITHUB_REF)"
           echo "issue_number = ${{ github.event.issue.number }}"
+      - name: Dump GitHub context to use for local testing
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "$GITHUB_CONTEXT" 
       - name: Invoke shared Ephemeral Workflow
         uses: actions/github-script@v6
         env:
           branch_ref: ${{ env.branch_name }}
         with:
           script: |-
-            github.issues.createComment({
-              issue_number: '${{ github.event.issue.number }}',
+            console.log(context);
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: 'Action succeeded! ✅ ',
             });  
-      - name: Dump GitHub context to use for local testing
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: |
-          echo "$GITHUB_CONTEXT"   
+  
