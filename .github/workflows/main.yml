@@ -10,12 +10,3 @@ jobs:
         with:
           MY_NAME: "Mona"
 
-  test:
-    name: Test if env vars are persisted from a previous action
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - uses: ./action-b
-      - run: |
-          # If FOO is set from action-b then env vars ARE persisted
-          echo "FOO=${FOO}"
