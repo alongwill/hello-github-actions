@@ -38,4 +38,9 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: 'Action succeeded! ✅ ',
-            });     
+            });  
+      - name: Dump GitHub context to use for local testing
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "$GITHUB_CONTEXT"   
