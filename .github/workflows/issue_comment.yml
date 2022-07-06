@@ -12,8 +12,6 @@ on:
 jobs:
   invoke-ephemeral-env-shared-workflow:
     runs-on: ubuntu-latest
-    if: ${{ contains(github.event.comment.body, '/ephemeral') }}
-
     steps:
       - name: Work out branch we are on
         id: branch
