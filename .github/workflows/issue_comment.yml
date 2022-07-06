@@ -1,0 +1,41 @@
+name: Invoke Ephemeral Workflow
+
+on:
+  issue_comment:
+    types:
+      - created
+    # branches:
+    #   - master
+    #   - main 
+    #   - develop
+
+jobs:
+  invoke-ephemeral-env-shared-workflow:
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.event.comment.body, '/ephemeral') }}
+
+    steps:
+      - name: Work out branch we are on
+        id: branch
+        run: |
+          REF=$(gh pr view ${{ github.event.issue.number }} -R Busuu/${GITHUB_REPOSITORY##*/} --json headRefName -q '.headRefName')
+          echo "branch_name=${REF}" >> ${GITHUB_ENV}
+          
+        # env:
+        #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Debug
+        run: |
+          echo "branch_ref   = $branch_name"
+          echo "issue_number = ${{ github.event.issue.number }}"
+      - name: Invoke shared Ephemeral Workflow
+        uses: actions/github-script@v6
+        env:
+          branch_ref: ${{ env.branch_name }}
+        with:
+          script: |-
+            github.issues.createComment({
+              issue_number: '${{ github.event.issue.number }}',
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Action succeeded! ✅ ',
+            });     
