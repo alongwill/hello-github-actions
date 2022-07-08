@@ -21,7 +21,25 @@ jobs:
           # If FOO is set from action-b then env vars ARE persisted
           echo "FOO=${FOO}"
 
-  test-json:
+  test-error-throw:
+    name: Test how to handle errors 
+    runs-on: ubuntu-latest
+    steps:
+      - name: top the action running
+        run: |
+          exit 1
+  
+  test-error-handle:
+    needs: test-error-throw
+    if : ${{ always() && needs.test-error.result=='failure' }}
+    name: Test handling errors
+    runs-on: ubuntu-latest
+    steps:
+      - name: Handle the errors
+        run: |
+          echo "I'm going to handle the error!"
+
+  test-json-as-env-var:
     name: Test passing JSON as an environment variable
     runs-on: ubuntu-latest
     steps:
