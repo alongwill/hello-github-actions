@@ -2,7 +2,7 @@ name: A workflow for my Hello World file
 on:
   workflow_dispatch:
 jobs:
-  build:
+  test-show-inside-container:
     name: Show what is inside a container
     runs-on: ubuntu-latest
     steps:
@@ -20,3 +20,48 @@ jobs:
       - run: |
           # If FOO is set from action-b then env vars ARE persisted
           echo "FOO=${FOO}"
+
+  test-error-throw:
+    name: Test how to handle errors 
+    runs-on: ubuntu-latest
+    steps:
+      - name: top the action running
+        run: |
+          exit 1
+  
+  test-error-handle:
+    needs: test-error-throw
+    if : ${{ always() && needs.test-error.result=='failure' }}
+    name: Test handling errors
+    runs-on: ubuntu-latest
+    steps:
+      - name: Handle the errors
+        run: |
+          echo "I'm going to handle the error!"
+
+  test-json-as-env-var:
+    name: Test passing JSON as an environment variable
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare JSON
+        run: |
+          CONFIGURATION='
+          { 
+            "webapp-service" : {
+              "ENTRYPOINT_K8S_API_URL": "api-::ephemeral_string::.k8s-green.eu-west-1.non-prod.mydomain.net",
+              "ENTRYPOINT_K8S_STATIC_PATH":" www-::ephemeral_string::.k8s-green.eu-west-1.non-prod.mydomain.net",
+              "ENTRYPOINT_K8S_BASE_URL": "www-::ephemeral_string::.k8s-green.eu-west-1.non-prod.mydomain.net"
+            },
+            "homepage-service" : {
+              "ENTRYPOINT_K8S_API_URL": "api-::ephemeral_string::.k8s-green.eu-west-1.non-prod.mydomain.net",
+              "ENTRYPOINT_K8S_WWW_URL": "www-::ephemeral_string::.k8s-green.eu-west-1.non-prod.mydomain.net"
+            },
+            "website-service" : {
+              "COOKIE_DOMAIN" : "mydomain.net"
+            }
+          }'
+          echo $CONFIGURATION | jq --compact-output .
+      # TODO:
+      #   Store as env var
+      #   Use jq to subsequently extract particular config
+      #   Scrap this approach and use a .yaml file?

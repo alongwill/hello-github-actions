@@ -1,4 +1,4 @@
-#
+# Attempt to understand how this works
 name: Invoke PR comment Workflow
 
 on:

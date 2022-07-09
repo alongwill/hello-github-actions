@@ -1,0 +1,39 @@
+name: Test GitHub script
+on:
+  workflow_dispatch:
+
+jobs:
+  build-container:
+    name: Test some script
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "Hello World"
+  
+  test-script:
+    needs: build-container
+    name: Test some script
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test building a URL from github context
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const run_url = github.server_url + '/' + github.repository + '/actions/runs/' + github.run_id
+            message = "This is a message"
+            message += '\n' + run_url
+            console.log(message)
+      - name: Test using Environment variables within JavaScript
+        uses: actions/github-script@v6
+        env:
+          FOO: BAR
+        with:
+          script: |
+            const { FOO } = process.env
+            if (`${FOO}` == 'BAR') {
+              console.log("True")
+            }
+            console.log('https://${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id}}')
+            console.log('needs.build-container.result = ${{ needs.build-container.result }}')
+            console.log(`FOO = ${FOO}`)
+            console.log(${{ github.server_url }})
